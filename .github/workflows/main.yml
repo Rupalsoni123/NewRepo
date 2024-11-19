@@ -1,0 +1,33 @@
+name: Trivy Scan Workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      docker_image:
+        description: 'Docker image to scan'
+        required: false
+        default: 'nginx:latest'  # Replace with any random image
+
+jobs:
+  trivy-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository (optional if scanning an image not in your repo)
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Install Trivy
+      - name: Install Trivy
+        run: |
+          sudo apt-get install wget -y
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+          echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | sudo tee -a /etc/apt/sources.list.d/trivy.list
+          sudo apt-get update
+          sudo apt-get install trivy -y
+
+      # Step 3: Scan the Docker image
+      - name: Run Trivy scan
+        run: |
+          echo "Scanning Docker image: ${{ github.event.inputs.docker_image }}"
+          trivy image --format table --severity HIGH,CRITICAL --ignore-unfixed ${{ github.event.inputs.docker_image }}
