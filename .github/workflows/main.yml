@@ -6,7 +6,7 @@ on:
       docker_image:
         description: 'Docker image to scan'
         required: false
-        default: 'nginx:latest'  # Replace with any random image
+        default: 'vulnerables/web-dvwa:latest'  # Replace with any random image
 
 jobs:
   trivy-scan:
